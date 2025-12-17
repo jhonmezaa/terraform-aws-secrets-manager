@@ -1,0 +1,39 @@
+# =============================================================================
+# Basic Secret Example - Variables
+# =============================================================================
+# This file contains example values for the basic secret example.
+# Copy this file to terraform.tfvars and modify the values as needed.
+
+# AWS Region
+# aws_region = "us-east-1"
+
+# Account and Project Names
+# account_name = "dev"
+# project_name = "myapp"
+
+# Secret Value (replace with your actual secret)
+# secret_value = "my-secret-api-key-value"
+
+# Tags
+# tags = {
+#   Environment = "Development"
+#   Team        = "Platform"
+#   CostCenter  = "Engineering"
+# }
+
+# =============================================================================
+# Usage Instructions
+# =============================================================================
+# 1. Copy this file: cp terraform.tfvars.example terraform.tfvars
+# 2. Update the secret_value with your actual secret
+# 3. Run: terraform init
+# 4. Run: terraform plan
+# 5. Run: terraform apply
+
+# =============================================================================
+# Security Note
+# =============================================================================
+# - Never commit terraform.tfvars to version control (it contains secrets)
+# - The secret value will be stored in Terraform state
+# - Use remote state with encryption for production
+# - Consider using external secret management for sensitive values

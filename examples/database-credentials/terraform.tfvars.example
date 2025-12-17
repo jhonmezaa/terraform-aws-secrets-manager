@@ -1,0 +1,37 @@
+# =============================================================================
+# Database Credentials Example - Configuration
+# =============================================================================
+# Copy this file to terraform.tfvars and customize the values
+# cp terraform.tfvars.example terraform.tfvars
+# =============================================================================
+
+# AWS region where the secret will be created
+aws_region = "us-east-1"
+
+# Account and project names for resource naming
+account_name = "dev"
+project_name = "database-creds"
+
+# Database master username (password will be auto-generated)
+db_username = "db_admin"
+
+# Recovery window in days (0 for dev/test, 30 for production)
+recovery_window_in_days = 30
+
+# Tags to apply to the secret
+tags = {
+  Environment = "Development"
+  ManagedBy   = "Terraform"
+  Example     = "DatabaseCredentials"
+  Purpose     = "RDS Master Credentials"
+}
+
+# =============================================================================
+# SECURITY NOTES:
+# =============================================================================
+# 1. The password is auto-generated (32 characters) - you don't need to specify it
+# 2. The secret will be stored in Terraform state - use remote state with encryption
+# 3. Use this secret ARN when creating RDS instances
+# 4. For production, set recovery_window_in_days = 30
+# 5. For dev/test, you can set recovery_window_in_days = 0 (immediate deletion)
+# =============================================================================

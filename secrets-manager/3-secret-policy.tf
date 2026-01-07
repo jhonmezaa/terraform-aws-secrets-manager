@@ -47,7 +47,7 @@ data "aws_iam_policy_document" "this" {
       }
 
       dynamic "condition" {
-        for_each = try(statement.value.conditions, {})
+        for_each = coalesce(lookup(statement.value, "conditions", null), {})
 
         content {
           test     = condition.value.test

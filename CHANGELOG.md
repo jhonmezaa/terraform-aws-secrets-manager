@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-01-07
+
+### Fixed
+
+#### IAM Policy Conditions Handling
+- Improved handling of optional conditions in IAM policy statements (`secrets-manager/3-secret-policy.tf`)
+- Changed from `try(statement.value.conditions, {})` to `coalesce(lookup(statement.value, "conditions", null), {})`
+- More robust handling of missing or null conditions attribute
+- Prevents potential issues with policy document generation when conditions are not provided
+
+### Technical Details
+
+**What Changed:**
+- The dynamic `condition` block in `aws_iam_policy_document` now uses `coalesce(lookup())` pattern
+- This ensures consistent behavior when the `conditions` attribute is:
+  - Not present in the statement
+  - Explicitly set to `null`
+  - Set to an empty map `{}`
+
+**Impact:**
+- More predictable behavior for policy creation
+- Better alignment with Terraform best practices
+- No breaking changes - fully backward compatible
+
 ## [1.0.0] - 2024-12-16
 
 ### 🎉 Initial Release

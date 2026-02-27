@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.0.4] - 2026-02-27
+
+### Fixed
+- Handle null safely in `recovery_window_in_days` validation using ternary instead of `||` (Terraform does not short-circuit)
+
+
 ## [v1.0.3] - 2026-02-27
 
 ### Changed

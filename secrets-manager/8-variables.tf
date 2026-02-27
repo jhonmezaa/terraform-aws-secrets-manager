@@ -78,7 +78,7 @@ variable "recovery_window_in_days" {
   default     = null
 
   validation {
-    condition     = var.recovery_window_in_days == null || (var.recovery_window_in_days == 0 || (var.recovery_window_in_days >= 7 && var.recovery_window_in_days <= 30))
+    condition     = var.recovery_window_in_days == null ? true : (var.recovery_window_in_days == 0 || (var.recovery_window_in_days >= 7 && var.recovery_window_in_days <= 30))
     error_message = "Recovery window must be 0 (immediate deletion) or between 7 and 30 days"
   }
 }

@@ -50,13 +50,16 @@ locals {
     "custom"
   )
 
+  # Name prefix: conditionally includes region prefix based on use_region_prefix
+  name_prefix = var.use_region_prefix ? "${local.region_prefix}-" : ""
+
   # -------------------------------------------------------------------------
   # Secret Naming
   # -------------------------------------------------------------------------
   # Generate secret name for tagging purposes (actual name uses name/name_prefix)
   secret_name = coalesce(
     var.name,
-    var.name_prefix != null ? "${var.name_prefix}-secret" : "${local.region_prefix}-secret-${var.account_name}-${var.project_name}"
+    var.name_prefix != null ? "${var.name_prefix}-secret" : "${local.name_prefix}secret-${var.account_name}-${var.project_name}"
   )
 
   # -------------------------------------------------------------------------

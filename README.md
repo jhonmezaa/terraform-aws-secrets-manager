@@ -255,6 +255,7 @@ Four complete examples are provided:
 | account_name | Account name for resource naming | `string` | n/a | yes |
 | project_name | Project name for resource naming | `string` | n/a | yes |
 | region_prefix | Region prefix for naming (auto-derived if not provided) | `string` | `null` | no |
+| use_region_prefix | Whether to include the region prefix in resource names | `bool` | `true` | no |
 | tags | Additional tags to apply to all resources | `map(string)` | `{}` | no |
 
 ### Secret Configuration

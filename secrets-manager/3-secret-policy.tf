@@ -25,7 +25,7 @@ data "aws_iam_policy_document" "this" {
       effect        = lookup(statement.value, "effect", "Allow")
       actions       = lookup(statement.value, "actions", null)
       not_actions   = lookup(statement.value, "not_actions", null)
-      resources     = lookup(statement.value, "resources", ["*"])
+      resources     = coalesce(lookup(statement.value, "resources", null), [aws_secretsmanager_secret.this[0].arn])
       not_resources = lookup(statement.value, "not_resources", null)
 
       dynamic "principals" {

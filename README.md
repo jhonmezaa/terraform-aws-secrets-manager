@@ -221,130 +221,131 @@ Four complete examples are provided:
 
 ## Requirements
 
-| Name | Version |
-|------|---------|
+| Name      | Version  |
+| --------- | -------- |
 | terraform | >= 1.5.0 |
-| aws | >= 5.0 |
-| random | >= 3.6 |
+| aws       | >= 5.0   |
+| random    | >= 3.6   |
 
 ## Providers
 
-| Name | Version |
-|------|---------|
-| aws | >= 5.0 |
-| random | >= 3.6 |
+| Name   | Version |
+| ------ | ------- |
+| aws    | >= 5.0  |
+| random | >= 3.6  |
 
 ## Resources
 
-| Type | Name |
-|------|------|
-| [aws_secretsmanager_secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | this |
-| [aws_secretsmanager_secret_version](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | this |
-| [aws_secretsmanager_secret_version](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | ignore_changes |
-| [aws_secretsmanager_secret_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_policy) | this |
-| [aws_secretsmanager_secret_rotation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_rotation) | this |
-| [random_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | this |
+| Type                                                                                                                                             | Name           |
+| ------------------------------------------------------------------------------------------------------------------------------------------------ | -------------- |
+| [aws_secretsmanager_secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret)                   | this           |
+| [aws_secretsmanager_secret_version](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version)   | this           |
+| [aws_secretsmanager_secret_version](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version)   | ignore_changes |
+| [aws_secretsmanager_secret_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_policy)     | this           |
+| [aws_secretsmanager_secret_rotation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_rotation) | this           |
+| [random_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password)                                       | this           |
 
 ## Inputs
 
 ### General Configuration
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| create | Whether to create all resources (master toggle) | `bool` | `true` | no |
-| account_name | Account name for resource naming | `string` | n/a | yes |
-| project_name | Project name for resource naming | `string` | n/a | yes |
-| region_prefix | Region prefix for naming (auto-derived if not provided) | `string` | `null` | no |
-| use_region_prefix | Whether to include the region prefix in resource names | `bool` | `true` | no |
-| tags | Additional tags to apply to all resources | `map(string)` | `{}` | no |
+| Name              | Description                                             | Type          | Default | Required |
+| ----------------- | ------------------------------------------------------- | ------------- | ------- | :------: |
+| create            | Whether to create all resources (master toggle)         | `bool`        | `true`  |    no    |
+| account_name      | Account name for resource naming                        | `string`      | n/a     |   yes    |
+| project_name      | Project name for resource naming                        | `string`      | n/a     |   yes    |
+| region_prefix     | Region prefix for naming (auto-derived if not provided) | `string`      | `null`  |    no    |
+| use_region_prefix | Whether to include the region prefix in resource names  | `bool`        | `true`  |    no    |
+| tags              | Additional tags to apply to all resources               | `map(string)` | `{}`    |    no    |
 
 ### Secret Configuration
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| name | Friendly name for the secret (mutually exclusive with name_prefix) | `string` | `null` | no |
-| name_prefix | Creates unique name with prefix (mutually exclusive with name) | `string` | `null` | no |
-| description | Description of the secret | `string` | `null` | no |
-| kms_key_id | KMS key ARN/ID for encryption | `string` | `null` | no |
-| recovery_window_in_days | Days to retain after deletion (0 or 7-30) | `number` | `null` | no |
-| force_overwrite_replica_secret | Overwrite same-named secret in destination region | `bool` | `false` | no |
+| Name                           | Description                                                        | Type     | Default | Required |
+| ------------------------------ | ------------------------------------------------------------------ | -------- | ------- | :------: |
+| name                           | Friendly name for the secret (mutually exclusive with name_prefix) | `string` | `null`  |    no    |
+| name_prefix                    | Creates unique name with prefix (mutually exclusive with name)     | `string` | `null`  |    no    |
+| description                    | Description of the secret                                          | `string` | `null`  |    no    |
+| kms_key_id                     | KMS key ARN/ID for encryption                                      | `string` | `null`  |    no    |
+| recovery_window_in_days        | Days to retain after deletion (0 or 7-30)                          | `number` | `null`  |    no    |
+| force_overwrite_replica_secret | Overwrite same-named secret in destination region                  | `bool`   | `false` |    no    |
 
 ### Secret Value Storage
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| secret_string | Plaintext or JSON secret data (sensitive) | `string` | `null` | no |
-| secret_binary | Base64-encoded binary data (sensitive) | `string` | `null` | no |
-| version_stages | Staging labels for the secret version | `list(string)` | `null` | no |
-| ignore_secret_changes | Ignore external changes (for rotated secrets) | `bool` | `false` | no |
+| Name                  | Description                                   | Type           | Default | Required |
+| --------------------- | --------------------------------------------- | -------------- | ------- | :------: |
+| secret_string         | Plaintext or JSON secret data (sensitive)     | `string`       | `null`  |    no    |
+| secret_binary         | Base64-encoded binary data (sensitive)        | `string`       | `null`  |    no    |
+| version_stages        | Staging labels for the secret version         | `list(string)` | `null`  |    no    |
+| ignore_secret_changes | Ignore external changes (for rotated secrets) | `bool`         | `false` |    no    |
 
 ### Multi-Region Replication
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| replica | Map of replica configurations | `map(object)` | `null` | no |
+| Name    | Description                   | Type          | Default | Required |
+| ------- | ----------------------------- | ------------- | ------- | :------: |
+| replica | Map of replica configurations | `map(object)` | `null`  |    no    |
 
 ### Random Password Generation
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| create_random_password | Generate random password | `bool` | `false` | no |
-| random_password_length | Password length (8-256) | `number` | `32` | no |
-| random_password_override_special | Custom special characters | `string` | `"!@#$%&*()-_=+[]{}<>:?"` | no |
+| Name                             | Description               | Type     | Default                   | Required |
+| -------------------------------- | ------------------------- | -------- | ------------------------- | :------: |
+| create_random_password           | Generate random password  | `bool`   | `false`                   |    no    |
+| random_password_length           | Password length (8-256)   | `number` | `32`                      |    no    |
+| random_password_override_special | Custom special characters | `string` | `"!@#$%&*()-_=+[]{}<>:?"` |    no    |
 
 ### Resource Policy
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| create_policy | Create resource-based IAM policy | `bool` | `false` | no |
-| source_policy_documents | List of IAM policy documents to merge | `list(string)` | `[]` | no |
-| override_policy_documents | Override policies by SID | `list(string)` | `[]` | no |
-| policy_statements | Custom IAM policy statements | `map(object)` | `null` | no |
-| block_public_policy | Block public access policies | `bool` | `true` | no |
+| Name                      | Description                           | Type           | Default | Required |
+| ------------------------- | ------------------------------------- | -------------- | ------- | :------: |
+| create_policy             | Create resource-based IAM policy      | `bool`         | `false` |    no    |
+| source_policy_documents   | List of IAM policy documents to merge | `list(string)` | `[]`    |    no    |
+| override_policy_documents | Override policies by SID              | `list(string)` | `[]`    |    no    |
+| policy_statements         | Custom IAM policy statements          | `map(object)`  | `null`  |    no    |
+| block_public_policy       | Block public access policies          | `bool`         | `true`  |    no    |
 
 ### Secret Rotation
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| enable_rotation | Enable automatic rotation | `bool` | `false` | no |
-| rotation_lambda_arn | Lambda ARN for rotation | `string` | `null` | no |
-| rotate_immediately | Rotate on creation (true) or wait for schedule | `bool` | `null` | no |
-| rotation_rules | Rotation schedule configuration | `object` | `null` | no |
+| Name                | Description                                    | Type     | Default | Required |
+| ------------------- | ---------------------------------------------- | -------- | ------- | :------: |
+| enable_rotation     | Enable automatic rotation                      | `bool`   | `false` |    no    |
+| rotation_lambda_arn | Lambda ARN for rotation                        | `string` | `null`  |    no    |
+| rotate_immediately  | Rotate on creation (true) or wait for schedule | `bool`   | `null`  |    no    |
+| rotation_rules      | Rotation schedule configuration                | `object` | `null`  |    no    |
 
 ## Outputs
 
-| Name | Description | Sensitive |
-|------|-------------|-----------|
-| secret_arn | The ARN of the secret | no |
-| secret_id | The ID of the secret | no |
-| secret_name | The name of the secret | no |
-| secret_replica | Attributes of replicas created | no |
-| secret_version_id | The version ID of the secret | no |
-| secret_string | The decrypted secret string | yes |
-| secret_binary | The decrypted binary data | yes |
-| secret_rotation_enabled | Whether rotation is enabled | no |
-| secret_rotation_lambda_arn | Lambda ARN handling rotation | no |
-| secret_policy | The resource-based IAM policy | no |
-| random_password | The generated random password | yes |
+| Name                       | Description                    | Sensitive |
+| -------------------------- | ------------------------------ | --------- |
+| secret_arn                 | The ARN of the secret          | no        |
+| secret_id                  | The ID of the secret           | no        |
+| secret_name                | The name of the secret         | no        |
+| secret_replica             | Attributes of replicas created | no        |
+| secret_version_id          | The version ID of the secret   | no        |
+| secret_string              | The decrypted secret string    | yes       |
+| secret_binary              | The decrypted binary data      | yes       |
+| secret_rotation_enabled    | Whether rotation is enabled    | no        |
+| secret_rotation_lambda_arn | Lambda ARN handling rotation   | no        |
+| secret_policy              | The resource-based IAM policy  | no        |
+| random_password            | The generated random password  | yes       |
 
 ## Region Prefix Mapping
 
 The module automatically derives region prefixes for consistent naming:
 
-| Region | Prefix | Region | Prefix |
-|--------|--------|--------|--------|
-| us-east-1 | ause1 | eu-west-1 | euw1 |
-| us-east-2 | ause2 | eu-west-2 | euw2 |
-| us-west-1 | usw1 | eu-west-3 | euw3 |
-| us-west-2 | usw2 | eu-central-1 | euc1 |
-| ap-southeast-1 | apse1 | eu-north-1 | eun1 |
-| ap-northeast-1 | apne1 | ca-central-1 | cac1 |
+| Region         | Prefix | Region       | Prefix |
+| -------------- | ------ | ------------ | ------ |
+| us-east-1      | ause1  | eu-west-1    | euw1   |
+| us-east-2      | ause2  | eu-west-2    | euw2   |
+| us-west-1      | usw1   | eu-west-3    | euw3   |
+| us-west-2      | usw2   | eu-central-1 | euc1   |
+| ap-southeast-1 | apse1  | eu-north-1   | eun1   |
+| ap-northeast-1 | apne1  | ca-central-1 | cac1   |
 
-*And 20+ more regions supported*
+_And 20+ more regions supported_
 
 ## Secret Naming Convention
 
 By default, secrets are named:
+
 ```
 {region_prefix}-secret-{account_name}-{project_name}
 ```

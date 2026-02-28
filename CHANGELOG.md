@@ -3,25 +3,26 @@
 ## [v1.0.5] - 2026-02-27
 
 ### Added
+
 - `use_region_prefix` boolean variable (default: `true`) to control whether the region prefix is included in resource names. When `false`, names omit the prefix
 
 ## [v1.0.4] - 2026-02-27
 
 ### Fixed
-- Handle null safely in `recovery_window_in_days` validation using ternary instead of `||` (Terraform does not short-circuit)
 
+- Handle null safely in `recovery_window_in_days` validation using ternary instead of `||` (Terraform does not short-circuit)
 
 ## [v1.0.3] - 2026-02-27
 
 ### Changed
-- Standardize Terraform `required_version` to `~> 1.0` across module and examples
 
+- Standardize Terraform `required_version` to `~> 1.0` across module and examples
 
 ## [v1.0.2] - 2026-02-27
 
 ### Changed
-- Update AWS provider constraint to `~> 6.0` across module and examples
 
+- Update AWS provider constraint to `~> 6.0` across module and examples
 
 All notable changes to this project will be documented in this file.
 
@@ -33,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 #### IAM Policy Conditions Handling
+
 - Improved handling of optional conditions in IAM policy statements (`secrets-manager/3-secret-policy.tf`)
 - Changed from `try(statement.value.conditions, {})` to `coalesce(lookup(statement.value, "conditions", null), {})`
 - More robust handling of missing or null conditions attribute
@@ -41,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Technical Details
 
 **What Changed:**
+
 - The dynamic `condition` block in `aws_iam_policy_document` now uses `coalesce(lookup())` pattern
 - This ensures consistent behavior when the `conditions` attribute is:
   - Not present in the statement
@@ -48,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Set to an empty map `{}`
 
 **Impact:**
+
 - More predictable behavior for policy creation
 - Better alignment with Terraform best practices
 - No breaking changes - fully backward compatible
@@ -61,6 +65,7 @@ First production-ready release of the AWS Secrets Manager Terraform module with 
 ### Added
 
 #### Core Secret Management
+
 - Secret creation with flexible naming (name vs name_prefix)
 - Description and metadata support
 - Support for string and binary secrets
@@ -68,12 +73,14 @@ First production-ready release of the AWS Secrets Manager Terraform module with 
 - Consistent resource naming convention across all resources
 
 #### Multi-Region Replication
+
 - Deploy secrets across multiple AWS regions
 - Per-region KMS encryption key configuration
 - Force overwrite capability for same-named secrets in target regions
 - Automatic synchronization of secret value changes
 
 #### Secret Rotation
+
 - Lambda function integration for custom rotation logic
 - Automatic rotation scheduling with flexible rules
 - Frequency-based rotation (every N days)
@@ -83,6 +90,7 @@ First production-ready release of the AWS Secrets Manager Terraform module with 
 - Structured secrets support (JSON database credentials)
 
 #### Random Password Generation
+
 - Ephemeral password generation (not persisted in state)
 - Configurable password length (8-256 characters, default 32)
 - Custom special character sets
@@ -90,12 +98,14 @@ First production-ready release of the AWS Secrets Manager Terraform module with 
 - Minimum character type requirements
 
 #### Encryption & Security
+
 - AWS KMS key support for encryption at rest
 - Custom KMS key per region (including replicas)
 - Defaults to AWS managed key (aws/secretsmanager) when not specified
 - Encryption for all secret values and metadata
 
 #### Access Control & Policies
+
 - Resource-based IAM policy attachment
 - Custom policy statements with principals, actions, resources
 - Condition-based access controls (IP, time, etc.)
@@ -105,18 +115,21 @@ First production-ready release of the AWS Secrets Manager Terraform module with 
 - Statement ID (SID) based override capability
 
 #### Deletion & Recovery
+
 - Configurable recovery window (0 or 7-30 days)
 - 0-day window for immediate deletion (dev/test)
 - Grace period for production data protection
 - Soft delete with recovery capability
 
 #### Version Management
+
 - Staging labels for secret versions
 - Support for external secret changes
 - Ignore-changes lifecycle for rotation scenarios
 - Version tracking and history
 
 #### Conditional Creation
+
 - Master `create` toggle for all resources
 - Ephemeral resources for write-only values
 - Lifecycle management for rotation-enabled secrets
@@ -124,7 +137,9 @@ First production-ready release of the AWS Secrets Manager Terraform module with 
 ### Features
 
 #### Numbered File Structure
+
 Module organized with clear 0-9 numbered files:
+
 - `0-versions.tf` - Terraform and provider requirements
 - `1-secret.tf` - Core secret resource
 - `2-secret-version.tf` - Version management (standard + ignore_changes)
@@ -137,6 +152,7 @@ Module organized with clear 0-9 numbered files:
 - `9-outputs.tf` - All outputs (11)
 
 #### Outputs (11 total)
+
 - Secret attributes (ARN, ID, name)
 - Secret replica information
 - Version identifiers
@@ -146,13 +162,16 @@ Module organized with clear 0-9 numbered files:
 - Generated passwords (sensitive)
 
 #### Examples
+
 Four complete examples with full documentation:
+
 - **basic**: Simple secret with static value and recovery window
 - **database-credentials**: Database credentials with auto-generated random password for RDS/Aurora (avoids circular dependencies)
 - **rotated**: Secret with Lambda rotation and random password generation
 - **replicated**: Multi-region secret with IAM policies and replication
 
 Each example includes:
+
 - `versions.tf` - Version constraints
 - `variables.tf` - Configurable parameters
 - `main.tf` - Module usage
@@ -161,6 +180,7 @@ Each example includes:
 - `terraform.tfvars.example` - Example values
 
 #### Documentation
+
 - Comprehensive README (425+ lines) with:
   - Complete usage examples for all features
   - Input variables reference table
@@ -175,6 +195,7 @@ Each example includes:
 - README for each example
 
 #### Code Quality
+
 - Terraform >= 1.5.0 compatibility
 - AWS Provider >= 5.0 compatibility
 - Random Provider >= 3.6 compatibility
@@ -188,11 +209,13 @@ Each example includes:
 ### Technical Details
 
 #### Supported Regions
+
 - All AWS commercial regions (25+)
 - Automatic region prefix mapping
 - Custom region prefix override support
 
 #### Resource Types
+
 - `aws_secretsmanager_secret` - Core secret resource
 - `aws_secretsmanager_secret_version` - Version management (2 patterns)
 - `aws_secretsmanager_secret_policy` - IAM policies
@@ -200,6 +223,7 @@ Each example includes:
 - `random_password` - Ephemeral password generation
 
 #### Performance
+
 - Efficient use of conditional creation
 - Minimal resource dependencies
 - Optimized data source queries
@@ -207,6 +231,7 @@ Each example includes:
 - Dynamic blocks for scalability
 
 #### Compatibility
+
 - Terraform >= 1.5.0
 - AWS Provider >= 5.0
 - Random Provider >= 3.6
@@ -217,10 +242,12 @@ Each example includes:
 ### Dependencies
 
 #### Required Providers
+
 - hashicorp/aws >= 5.0
 - hashicorp/random >= 3.6
 
 #### Terraform Version
+
 - terraform >= 1.5.0
 
 ### Notes

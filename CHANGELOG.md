@@ -1,5 +1,10 @@
 # Changelog
 
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
 ## [v1.0.9] - 2026-10-27
 
 ### Fixed
@@ -39,12 +44,7 @@
 
 - Update AWS provider constraint to `~> 6.0` across module and examples
 
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [1.0.1] - 2026-01-07
+## [v1.0.1] - 2026-01-07
 
 ### Fixed
 
@@ -71,7 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Better alignment with Terraform best practices
 - No breaking changes - fully backward compatible
 
-## [1.0.0] - 2024-12-16
+## [v1.0.0] - 2024-12-16
 
 ### 🎉 Initial Release
 
@@ -301,4 +301,4 @@ None reported in this release.
 - [x] terraform.tfvars.example added to all examples
 - [x] README.md added to each example
 
-[1.0.0]: https://github.com/jhonmezaa/terraform-aws-secrets-manager/releases/tag/v1.0.0
+[v1.0.0]: https://github.com/jhonmezaa/terraform-aws-secrets-manager/releases/tag/v1.0.0

@@ -223,15 +223,15 @@ Four complete examples are provided:
 
 | Name      | Version  |
 | --------- | -------- |
-| terraform | >= 1.5.0 |
-| aws       | >= 5.0   |
+| terraform | >= 1.3   |
+| aws       | >= 6.0   |
 | random    | >= 3.6   |
 
 ## Providers
 
 | Name   | Version |
 | ------ | ------- |
-| aws    | >= 5.0  |
+| aws    | >= 6.0  |
 | random | >= 3.6  |
 
 ## Resources

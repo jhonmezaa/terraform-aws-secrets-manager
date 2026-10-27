@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.10] - 2026-10-27
+
+### Changed
+
+- Normalize CHANGELOG: preamble moved to the top, all headings use the `## [vX.Y.Z] - YYYY-MM-DD` format, entries sorted by version (newest first)
+- Add missing entries for v1.0.6 and v1.0.7, reconstructed from git history
+
 ## [v1.0.9] - 2026-10-27
 
 ### Fixed
@@ -19,6 +26,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Set module `required_version` to `>= 1.3` (was `~> 1.0`): the module uses `optional()` object type attributes (with defaults), which require Terraform 1.3; no newer features (`moved`/`import`/`check`/`removed`, cross-variable validations, provider-defined functions, ephemeral resources) are used. Random provider constraint (`>= 3.6`) was already minimum-only and is unchanged
 - Examples (root modules) keep pessimistic constraints: `required_version` `~> 1.3`, AWS provider `~> 6.0`; the `database-credentials` example now pins random provider to `~> 3.6`
 - Update Terraform and provider requirements in README and example READMEs
+
+## [v1.0.7] - 2026-02-28
+
+### Changed
+
+- Update README and CHANGELOG documentation
+
+## [v1.0.6] - 2026-02-28
+
+### Fixed
+
+- Malformed resource policy when `policy_statements` do not specify `resources`: the default is now the secret's own ARN (via `coalesce()`) instead of `["*"]`, which caused `MalformedPolicyDocumentException`
 
 ## [v1.0.5] - 2026-02-27
 

@@ -253,9 +253,9 @@ EOT
 
 | Name | Version |
 |------|---------|
-| terraform | >= 1.5.0 |
-| aws | >= 5.0 |
-| random | >= 3.6 |
+| terraform | ~> 1.3 |
+| aws | ~> 6.0 |
+| random | ~> 3.6 |
 
 ## Cleanup
 

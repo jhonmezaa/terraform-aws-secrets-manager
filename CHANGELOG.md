@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.1.0] - 2026-11-17
+
+### Added
+
+- `region` variable (AWS provider v6 per-resource region) passed to every resource; it also drives the region prefix (`coalesce(var.region, data.aws_region.current.region)`)
+- `tags_common` variable, merged as `merge(tags_common, tags, { Name, ManagedBy })` following the module conventions
+- `create_secret_version` variable (default `true`) to skip the secret version when the value is managed outside Terraform (upstream parity)
+- `replica[*].region` is now optional and defaults to the map key (upstream parity)
+- Validation for `account_name` and `project_name` (1-32 characters, `^[a-z0-9-]+$`)
+
+### Fixed
+
+- `enable_rotation = true` with `rotation_rules = null` failed at plan (`lookup()` on a null value); the `rotation_rules` block is now dynamic
+- Policy statements with `not_resources` also received the default `resources` (secret ARN), producing an invalid statement with both keys
+- `rotation_lambda_arn` validation rejected non-commercial partitions (`arn:aws-us-gov:`, `arn:aws-cn:`)
+- `ignore_secret_changes = true` now also ignores `version_stages`, which rotation moves outside Terraform
+- `examples/basic` used `timestamp()` inside `secret_string`, causing a new secret version on every apply
+- `examples/rotated` did not declare the `random` provider it uses
+- Descriptions and README claimed the random password was ephemeral and not stored in state; `random_password` is stored in state
+- Policy statement docs: `sid` has no default (IAM only accepts alphanumeric SIDs) and `resources` defaults to the secret ARN, not `["*"]`
+- README: `source` refs pointed to `v1.0.0`; inputs table was missing `db_username`, `region`, `tags_common` and `create_secret_version`; unclosed code block in `examples/basic/README.md`
+
+### Changed
+
+- Removed the unused `aws_caller_identity` data source
+- Examples pass their tags through `tags_common`
+
+### Upgrade notes
+
+- `Name` and `ManagedBy` tags now take precedence over user tags (previously a `Name`/`ManagedBy` key in `tags` overrode them). If you set `tags.Name`, expect an in-place tag update; use `name` to change the secret name instead
+- `account_name`/`project_name` values with uppercase letters, underscores or more than 32 characters now fail validation. Change them to valid values and set `name` to the current secret name to avoid a rename, since renaming a secret forces replacement
+- No resource is recreated: resource addresses and generated names are unchanged
+
 ## [v1.0.10] - 2026-10-27
 
 ### Changed

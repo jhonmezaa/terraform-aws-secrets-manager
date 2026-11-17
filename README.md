@@ -7,7 +7,7 @@ Production-ready Terraform module for creating and managing AWS Secrets Manager 
 - **Secret Creation & Management**: Flexible naming (name vs name_prefix), descriptions, and metadata
 - **Multi-Region Replication**: Deploy secrets across multiple AWS regions with per-region KMS encryption
 - **Secret Rotation**: Automatic rotation using AWS Lambda with flexible scheduling (frequency or cron-based)
-- **Random Password Generation**: Ephemeral password generation that isn't persisted in Terraform state
+- **Random Password Generation**: `random_password` generation (optionally as a `{"username","password"}` JSON for databases). The value is stored in Terraform state
 - **KMS Encryption**: Custom KMS key support for encryption at rest
 - **Resource Policies**: IAM policies with principals, actions, conditions, and cross-account access
 - **Version Management**: Staging labels and lifecycle management for rotated secrets
@@ -21,7 +21,7 @@ Production-ready Terraform module for creating and managing AWS Secrets Manager 
 
 ```hcl
 module "basic_secret" {
-  source = "github.com/jhonmezaa/terraform-aws-secrets-manager//secrets-manager?ref=v1.0.0"
+  source = "github.com/jhonmezaa/terraform-aws-secrets-manager//secrets-manager?ref=v1.1.0"
 
   account_name = "prod"
   project_name = "myapp"
@@ -33,7 +33,7 @@ module "basic_secret" {
 
   recovery_window_in_days = 30
 
-  tags = {
+  tags_common = {
     Environment = "Production"
   }
 }
@@ -43,7 +43,7 @@ module "basic_secret" {
 
 ```hcl
 module "password_secret" {
-  source = "github.com/jhonmezaa/terraform-aws-secrets-manager//secrets-manager?ref=v1.0.0"
+  source = "github.com/jhonmezaa/terraform-aws-secrets-manager//secrets-manager?ref=v1.1.0"
 
   account_name = "prod"
   project_name = "database"
@@ -54,7 +54,7 @@ module "password_secret" {
 
   recovery_window_in_days = 30
 
-  tags = {
+  tags_common = {
     Environment = "Production"
     Database    = "PostgreSQL"
   }
@@ -65,7 +65,7 @@ module "password_secret" {
 
 ```hcl
 module "rotated_secret" {
-  source = "github.com/jhonmezaa/terraform-aws-secrets-manager//secrets-manager?ref=v1.0.0"
+  source = "github.com/jhonmezaa/terraform-aws-secrets-manager//secrets-manager?ref=v1.1.0"
 
   account_name = "prod"
   project_name = "rds"
@@ -87,7 +87,7 @@ module "rotated_secret" {
 
   recovery_window_in_days = 30
 
-  tags = {
+  tags_common = {
     Environment = "Production"
     Rotation    = "Enabled"
   }
@@ -98,7 +98,7 @@ module "rotated_secret" {
 
 ```hcl
 module "global_secret" {
-  source = "github.com/jhonmezaa/terraform-aws-secrets-manager//secrets-manager?ref=v1.0.0"
+  source = "github.com/jhonmezaa/terraform-aws-secrets-manager//secrets-manager?ref=v1.1.0"
 
   account_name = "prod"
   project_name = "global-api"
@@ -120,7 +120,7 @@ module "global_secret" {
 
   recovery_window_in_days = 30
 
-  tags = {
+  tags_common = {
     Environment = "Production"
     Replication = "Enabled"
   }
@@ -131,7 +131,7 @@ module "global_secret" {
 
 ```hcl
 module "policy_secret" {
-  source = "github.com/jhonmezaa/terraform-aws-secrets-manager//secrets-manager?ref=v1.0.0"
+  source = "github.com/jhonmezaa/terraform-aws-secrets-manager//secrets-manager?ref=v1.1.0"
 
   account_name = "prod"
   project_name = "shared"
@@ -165,7 +165,7 @@ module "policy_secret" {
 
   block_public_policy = true
 
-  tags = {
+  tags_common = {
     Environment = "Production"
     Access      = "Restricted"
   }
@@ -176,7 +176,7 @@ module "policy_secret" {
 
 ```hcl
 module "conditional_secret" {
-  source = "github.com/jhonmezaa/terraform-aws-secrets-manager//secrets-manager?ref=v1.0.0"
+  source = "github.com/jhonmezaa/terraform-aws-secrets-manager//secrets-manager?ref=v1.1.0"
 
   account_name = "prod"
   project_name = "restricted"
@@ -203,7 +203,7 @@ module "conditional_secret" {
     }
   }
 
-  tags = {
+  tags_common = {
     Environment = "Production"
     Security    = "IP-Restricted"
   }
@@ -252,11 +252,13 @@ Four complete examples are provided:
 | Name              | Description                                             | Type          | Default | Required |
 | ----------------- | ------------------------------------------------------- | ------------- | ------- | :------: |
 | create            | Whether to create all resources (master toggle)         | `bool`        | `true`  |    no    |
-| account_name      | Account name for resource naming                        | `string`      | n/a     |   yes    |
-| project_name      | Project name for resource naming                        | `string`      | n/a     |   yes    |
+| account_name      | Account name for resource naming (1-32 chars, `^[a-z0-9-]+$`) | `string` | n/a | yes |
+| project_name      | Project name for resource naming (1-32 chars, `^[a-z0-9-]+$`) | `string` | n/a | yes |
 | region_prefix     | Region prefix for naming (auto-derived if not provided) | `string`      | `null`  |    no    |
 | use_region_prefix | Whether to include the region prefix in resource names  | `bool`        | `true`  |    no    |
-| tags              | Additional tags to apply to all resources               | `map(string)` | `{}`    |    no    |
+| region            | Per-resource region (AWS provider v6). Defaults to the provider region; also drives the region prefix | `string` | `null` | no |
+| tags_common       | Common tags applied to all taggable resources           | `map(string)` | `{}`    |    no    |
+| tags              | Additional tags (backward compatibility), merged on top of `tags_common` | `map(string)` | `{}` | no |
 
 ### Secret Configuration
 
@@ -276,13 +278,14 @@ Four complete examples are provided:
 | secret_string         | Plaintext or JSON secret data (sensitive)     | `string`       | `null`  |    no    |
 | secret_binary         | Base64-encoded binary data (sensitive)        | `string`       | `null`  |    no    |
 | version_stages        | Staging labels for the secret version         | `list(string)` | `null`  |    no    |
-| ignore_secret_changes | Ignore external changes (for rotated secrets) | `bool`         | `false` |    no    |
+| create_secret_version | Create a secret version (set `false` when the value is managed outside Terraform) | `bool` | `true` | no |
+| ignore_secret_changes | Ignore external changes to `secret_string`, `secret_binary` and `version_stages` (for rotated secrets) | `bool` | `false` | no |
 
 ### Multi-Region Replication
 
 | Name    | Description                   | Type          | Default | Required |
 | ------- | ----------------------------- | ------------- | ------- | :------: |
-| replica | Map of replica configurations | `map(object)` | `null`  |    no    |
+| replica | Map of replica configurations (`region` optional, defaults to the map key; `kms_key_id` optional) | `map(object)` | `null` | no |
 
 ### Random Password Generation
 
@@ -291,6 +294,7 @@ Four complete examples are provided:
 | create_random_password           | Generate random password  | `bool`   | `false`                   |    no    |
 | random_password_length           | Password length (8-256)   | `number` | `32`                      |    no    |
 | random_password_override_special | Custom special characters | `string` | `"!@#$%&*()-_=+[]{}<>:?"` |    no    |
+| db_username                      | When set with `create_random_password = true`, the secret is `{"username","password"}` JSON | `string` | `null` | no |
 
 ### Resource Policy
 
@@ -307,9 +311,9 @@ Four complete examples are provided:
 | Name                | Description                                    | Type     | Default | Required |
 | ------------------- | ---------------------------------------------- | -------- | ------- | :------: |
 | enable_rotation     | Enable automatic rotation                      | `bool`   | `false` |    no    |
-| rotation_lambda_arn | Lambda ARN for rotation                        | `string` | `null`  |    no    |
+| rotation_lambda_arn | Lambda ARN for rotation (any partition; null for managed rotation) | `string` | `null` | no |
 | rotate_immediately  | Rotate on creation (true) or wait for schedule | `bool`   | `null`  |    no    |
-| rotation_rules      | Rotation schedule configuration                | `object` | `null`  |    no    |
+| rotation_rules      | Rotation schedule configuration (block omitted when `null`) | `object` | `null` | no |
 
 ## Outputs
 
@@ -340,7 +344,7 @@ The module automatically derives region prefixes for consistent naming:
 | ap-southeast-1 | apse1  | eu-north-1   | eun1   |
 | ap-northeast-1 | apne1  | ca-central-1 | cac1   |
 
-_And 20+ more regions supported_
+_And 20+ more regions supported. Regions missing from the map use the prefix `custom` (set `region_prefix` to override)._
 
 ## Secret Naming Convention
 
@@ -395,7 +399,7 @@ rotation_rules = {
 
 ### Rotation
 
-1. **Use `ignore_secret_changes = true`** for rotated secrets
+1. **Use `ignore_secret_changes = true`** for rotated secrets. With `enable_rotation = true` and `ignore_secret_changes = false`, Terraform would revert the rotated value on the next apply
 2. **Test rotation logic** in non-production first
 3. **Monitor rotation** via CloudWatch Logs
 4. **Ensure Lambda permissions** are correctly configured
@@ -411,7 +415,7 @@ rotation_rules = {
 
 1. **Use appropriate recovery windows** (0 days for dev/test)
 2. **Minimize replication** to only necessary regions
-3. **Use random password generation** instead of storing passwords in state
+3. **Use random password generation** instead of hard-coding passwords (the generated value is still stored in state)
 4. **Clean up unused secrets** regularly
 
 ## License

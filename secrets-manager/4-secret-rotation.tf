@@ -7,22 +7,29 @@
 resource "aws_secretsmanager_secret_rotation" "this" {
   count = var.create && var.enable_rotation ? 1 : 0
 
+  region = var.region
+
   secret_id           = aws_secretsmanager_secret.this[0].id
   rotation_lambda_arn = var.rotation_lambda_arn
 
   # Rotate immediately on creation (true) or wait for schedule (false/null)
   rotate_immediately = var.rotate_immediately
 
-  rotation_rules {
-    # Frequency-based: Rotate every N days
-    automatically_after_days = lookup(var.rotation_rules, "automatically_after_days", null)
+  # Only rendered when rotation_rules is set (the block is optional in the provider)
+  dynamic "rotation_rules" {
+    for_each = var.rotation_rules != null ? [var.rotation_rules] : []
 
-    # Cron-based: Specific time/day (e.g., "cron(0 2 * * ? *)")
-    # OR rate-based: (e.g., "rate(30 days)")
-    schedule_expression = lookup(var.rotation_rules, "schedule_expression", null)
+    content {
+      # Frequency-based: Rotate every N days
+      automatically_after_days = rotation_rules.value.automatically_after_days
 
-    # Duration of rotation window (e.g., "3h", "PT3H")
-    duration = lookup(var.rotation_rules, "duration", null)
+      # Cron-based: Specific time/day (e.g., "cron(0 2 * * ? *)")
+      # OR rate-based: (e.g., "rate(30 days)")
+      schedule_expression = rotation_rules.value.schedule_expression
+
+      # Duration of rotation window (e.g., "3h", "PT3H")
+      duration = rotation_rules.value.duration
+    }
   }
 
   depends_on = [

@@ -11,7 +11,9 @@
 # Use this when Terraform fully manages the secret value
 
 resource "aws_secretsmanager_secret_version" "this" {
-  count = var.create && !var.ignore_secret_changes ? 1 : 0
+  count = var.create && var.create_secret_version && !var.ignore_secret_changes ? 1 : 0
+
+  region = var.region
 
   secret_id     = aws_secretsmanager_secret.this[0].id
   secret_string = local.secret_string
@@ -29,7 +31,9 @@ resource "aws_secretsmanager_secret_version" "this" {
 # Terraform will not detect drift on secret_string or secret_binary changes
 
 resource "aws_secretsmanager_secret_version" "ignore_changes" {
-  count = var.create && var.ignore_secret_changes ? 1 : 0
+  count = var.create && var.create_secret_version && var.ignore_secret_changes ? 1 : 0
+
+  region = var.region
 
   secret_id     = aws_secretsmanager_secret.this[0].id
   secret_string = local.secret_string
@@ -41,6 +45,7 @@ resource "aws_secretsmanager_secret_version" "ignore_changes" {
     ignore_changes = [
       secret_string,
       secret_binary,
+      version_stages,
     ]
   }
 

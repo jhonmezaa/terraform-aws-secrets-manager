@@ -34,5 +34,5 @@ module "rotated_secret" {
 
   recovery_window_in_days = 30
 
-  tags = var.tags
+  tags_common = var.tags
 }

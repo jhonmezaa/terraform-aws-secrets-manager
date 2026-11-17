@@ -15,11 +15,27 @@ variable "create" {
 variable "account_name" {
   description = "Account name for resource naming"
   type        = string
+
+  validation {
+    condition     = length(var.account_name) >= 1 && length(var.account_name) <= 32 && can(regex("^[a-z0-9-]+$", var.account_name))
+    error_message = "account_name debe tener entre 1 y 32 caracteres y solo puede contener minúsculas, números y guiones."
+  }
 }
 
 variable "project_name" {
   description = "Project name for resource naming"
   type        = string
+
+  validation {
+    condition     = length(var.project_name) >= 1 && length(var.project_name) <= 32 && can(regex("^[a-z0-9-]+$", var.project_name))
+    error_message = "project_name debe tener entre 1 y 32 caracteres y solo puede contener minúsculas, números y guiones."
+  }
+}
+
+variable "region" {
+  description = "Region where the resources will be managed (AWS provider v6 per-resource region). Defaults to the region set in the provider configuration. Also used to derive the region prefix"
+  type        = string
+  default     = null
 }
 
 variable "region_prefix" {
@@ -34,8 +50,14 @@ variable "use_region_prefix" {
   default     = true
 }
 
+variable "tags_common" {
+  description = "Common tags applied to all taggable resources"
+  type        = map(string)
+  default     = {}
+}
+
 variable "tags" {
-  description = "Additional tags to apply to all resources"
+  description = "Additional tags to apply to all resources. Kept for backward compatibility; merged on top of `tags_common`"
   type        = map(string)
   default     = {}
 }
@@ -119,8 +141,14 @@ variable "version_stages" {
   default     = null
 }
 
+variable "create_secret_version" {
+  description = "Whether to create a secret version. Set to `false` when the secret value is managed outside Terraform (manually, by CI or by a rotation process)"
+  type        = bool
+  default     = true
+}
+
 variable "ignore_secret_changes" {
-  description = "Whether to ignore external changes to secret content (useful for Lambda-rotated secrets). WARNING: Changes to this value will recreate the secret version"
+  description = "Whether to ignore external changes to secret content and staging labels (required for rotated secrets). WARNING: Changes to this value will recreate the secret version"
   type        = bool
   default     = false
 }
@@ -132,7 +160,7 @@ variable "ignore_secret_changes" {
 variable "replica" {
   description = <<-EOT
     Map of replica configurations for multi-region secret replication. Each key is a friendly name, value is an object with:
-    - region: AWS region to replicate to (required)
+    - region: AWS region to replicate to (optional, defaults to the map key)
     - kms_key_id: KMS key ARN/ID for encryption in that region (optional, defaults to AWS managed key)
 
     Example:
@@ -147,7 +175,7 @@ variable "replica" {
     }
   EOT
   type = map(object({
-    region     = string
+    region     = optional(string)
     kms_key_id = optional(string)
   }))
   default = null
@@ -158,7 +186,7 @@ variable "replica" {
 # =============================================================================
 
 variable "create_random_password" {
-  description = "Whether to generate a random password for the secret. Password is ephemeral and not stored in Terraform state"
+  description = "Whether to generate a random password (random_password resource) for the secret. The password is stored in Terraform state; use an encrypted remote backend"
   type        = bool
   default     = false
 }
@@ -219,11 +247,11 @@ variable "override_policy_documents" {
 variable "policy_statements" {
   description = <<-EOT
     Map of custom IAM policy statements to attach to the secret. Each key is a statement identifier, value is an object with:
-    - sid: Statement ID (optional, defaults to key)
+    - sid: Statement ID (optional, alphanumeric only; omitted when null)
     - effect: Allow or Deny (optional, defaults to Allow)
     - actions: List of allowed/denied actions (e.g., ["secretsmanager:GetSecretValue"])
     - not_actions: List of excluded actions
-    - resources: List of resource ARNs (defaults to ["*"] for the secret itself)
+    - resources: List of resource ARNs (defaults to the secret ARN unless not_resources is set)
     - not_resources: List of excluded resources
     - principals: Object with 'type' and 'identifiers' (e.g., {type = "AWS", identifiers = ["arn:aws:iam::123:role/MyRole"]})
     - not_principals: Excluded principals
@@ -282,12 +310,12 @@ variable "enable_rotation" {
 }
 
 variable "rotation_lambda_arn" {
-  description = "ARN of the Lambda function that handles secret rotation. Required if enable_rotation is true"
+  description = "ARN of the Lambda function that handles secret rotation. Required for Lambda-based rotation; may be null for managed rotation"
   type        = string
   default     = null
 
   validation {
-    condition     = var.rotation_lambda_arn == null || can(regex("^arn:aws:lambda:", var.rotation_lambda_arn))
+    condition     = var.rotation_lambda_arn == null || can(regex("^arn:aws[a-zA-Z-]*:lambda:", var.rotation_lambda_arn))
     error_message = "rotation_lambda_arn must be a valid Lambda ARN"
   }
 }

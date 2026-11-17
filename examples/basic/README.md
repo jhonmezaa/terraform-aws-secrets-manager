@@ -23,3 +23,4 @@ terraform apply
 
 # Clean up
 terraform destroy
+```

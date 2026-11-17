@@ -40,7 +40,7 @@ module "database_credentials" {
 
   recovery_window_in_days = var.recovery_window_in_days
 
-  tags = var.tags
+  tags_common = var.tags
 }
 
 # -----------------------------------------------------------------------------

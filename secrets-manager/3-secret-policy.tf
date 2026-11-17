@@ -21,15 +21,16 @@ data "aws_iam_policy_document" "this" {
     for_each = var.policy_statements != null ? var.policy_statements : {}
 
     content {
-      sid           = lookup(statement.value, "sid", statement.key)
-      effect        = lookup(statement.value, "effect", "Allow")
-      actions       = lookup(statement.value, "actions", null)
-      not_actions   = lookup(statement.value, "not_actions", null)
-      resources     = coalesce(lookup(statement.value, "resources", null), [aws_secretsmanager_secret.this[0].arn])
-      not_resources = lookup(statement.value, "not_resources", null)
+      sid         = statement.value.sid
+      effect      = coalesce(statement.value.effect, "Allow")
+      actions     = statement.value.actions
+      not_actions = statement.value.not_actions
+      # Default to the secret ARN, unless not_resources is used (both are mutually exclusive in IAM)
+      resources     = statement.value.not_resources != null ? statement.value.resources : coalesce(statement.value.resources, [aws_secretsmanager_secret.this[0].arn])
+      not_resources = statement.value.not_resources
 
       dynamic "principals" {
-        for_each = lookup(statement.value, "principals", null) != null ? [statement.value.principals] : []
+        for_each = statement.value.principals != null ? [statement.value.principals] : []
 
         content {
           type        = principals.value.type
@@ -38,7 +39,7 @@ data "aws_iam_policy_document" "this" {
       }
 
       dynamic "not_principals" {
-        for_each = lookup(statement.value, "not_principals", null) != null ? [statement.value.not_principals] : []
+        for_each = statement.value.not_principals != null ? [statement.value.not_principals] : []
 
         content {
           type        = not_principals.value.type
@@ -47,7 +48,7 @@ data "aws_iam_policy_document" "this" {
       }
 
       dynamic "condition" {
-        for_each = coalesce(lookup(statement.value, "conditions", null), {})
+        for_each = statement.value.conditions != null ? statement.value.conditions : {}
 
         content {
           test     = condition.value.test
@@ -66,6 +67,8 @@ data "aws_iam_policy_document" "this" {
 
 resource "aws_secretsmanager_secret_policy" "this" {
   count = var.create && var.create_policy ? 1 : 0
+
+  region = var.region
 
   secret_arn          = aws_secretsmanager_secret.this[0].arn
   policy              = data.aws_iam_policy_document.this[0].json

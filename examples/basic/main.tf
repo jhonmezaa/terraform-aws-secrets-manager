@@ -23,10 +23,9 @@ module "basic_secret" {
   description = "Basic API key secret"
   secret_string = jsonencode({
     api_key = var.secret_value
-    created = timestamp()
   })
 
   recovery_window_in_days = 30
 
-  tags = var.tags
+  tags_common = var.tags
 }

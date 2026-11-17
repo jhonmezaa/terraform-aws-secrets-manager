@@ -11,6 +11,8 @@
 resource "aws_secretsmanager_secret" "this" {
   count = var.create ? 1 : 0
 
+  region = var.region
+
   # Use name_prefix if provided, otherwise use name (or auto-generated name)
   name                           = var.name_prefix == null ? coalesce(var.name, local.secret_name) : null
   name_prefix                    = var.name_prefix
@@ -23,16 +25,17 @@ resource "aws_secretsmanager_secret" "this" {
     for_each = var.replica != null ? var.replica : {}
 
     content {
-      region     = replica.value.region
-      kms_key_id = lookup(replica.value, "kms_key_id", null)
+      region     = coalesce(replica.value.region, replica.key)
+      kms_key_id = replica.value.kms_key_id
     }
   }
 
   tags = merge(
+    var.tags_common,
+    var.tags,
     {
       Name      = local.secret_name
       ManagedBy = "Terraform"
-    },
-    var.tags
+    }
   )
 }

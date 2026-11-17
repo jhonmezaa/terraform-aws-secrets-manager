@@ -1,8 +1,8 @@
 # =============================================================================
 # Random Password Generation
 # =============================================================================
-# Generates ephemeral random passwords that are NOT persisted in Terraform state
-# Useful for initial password generation or one-time secret creation
+# Generates a random password with the random_password resource.
+# NOTE: the result IS stored in Terraform state (use an encrypted remote backend).
 
 resource "random_password" "this" {
   count = var.create && var.create_random_password ? 1 : 0

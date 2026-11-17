@@ -43,10 +43,13 @@ locals {
   # -------------------------------------------------------------------------
   # Region Prefix
   # -------------------------------------------------------------------------
-  # Use custom region_prefix if provided, otherwise derive from current region
+  # Effective region: explicit var.region (per-resource region) or provider region
+  region = coalesce(var.region, data.aws_region.current.region)
+
+  # Use custom region_prefix if provided, otherwise derive from the effective region
   region_prefix = var.region_prefix != null ? var.region_prefix : lookup(
     local.region_prefix_map,
-    data.aws_region.current.region,
+    local.region,
     "custom"
   )
 
